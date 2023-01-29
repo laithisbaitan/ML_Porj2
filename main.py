@@ -1,9 +1,20 @@
 import numpy as np
 import pandas as pd
-import seaborn
+import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn import tree
+from sklearn import svm
 
 # Load the data
 df = pd.read_excel('WeatherData.xls')
@@ -19,7 +30,7 @@ for column in df.columns:
         median = df[column].median()
         df[column].fillna(median, inplace=True)
 
-    # filling the missing category values
+# filling the missing category values
 for column in df.columns:
     if df[column].dtype == 'object':
         df[column].fillna(df[column].mode()[0], inplace=True)
@@ -61,8 +72,136 @@ df = pd.get_dummies(df, columns=['WindGustDir', 'WindDir9am', 'WindDir3pm'])
 df['RainToday2'] = df['RainToday'].map({'Yes': 1, 'No': 0})
 df['RainTomorrow2'] = df['RainTomorrow'].map({'Yes': 1, 'No': 0})
 
+df = df.drop(columns=['RainTomorrow'], axis=1)
+df = df.drop(columns=['RainToday'], axis=1)
+
 corr_matrix = df.corr()
 fig, ax = plt.subplots(figsize=(20, 18))
-sns.heatmap(corr_matrix, ax=ax)
+# sns.heatmap(corr_matrix, ax=ax)
+# sns.heatmap(corr_matrix, ax=ax, annot=True , fmt='.1g')
+# plt.show()
 
-plt.show()
+# spliting data into 80% training and 20% testing 
+Y = df['RainTomorrow2']
+X = df.drop('RainTomorrow2',axis=1)
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+#*************Naive Bayes***************
+def NB():
+    print("******Naive Bayes********")
+    # create the naive bayes model
+    NBmodel = GaussianNB()
+
+    # fit the model on the training data
+    NBmodel.fit(X_train, y_train)
+
+    # make predictions on the test data
+    y_pred = NBmodel.predict(X_test)
+
+    # evaluate the model performance
+    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("Precision:", precision_score(y_test, y_pred))
+    print("Recall:", recall_score(y_test, y_pred))
+
+    y_scores = NBmodel.predict_proba(X_test)[:, 1]
+    # calculate AUC
+    print('AUC:', roc_auc_score(y_test, y_scores))
+
+    # generate the confusion matrix
+    matrix = confusion_matrix(y_test, y_pred)
+    print("Confusion Matrix:")
+    print(matrix)
+
+#*************KNN***************
+def KNN():
+    print("******KNN********")
+    # Odd or Even
+    neighbors = math.isqrt(len(y_test))
+    print(neighbors)
+
+    knn = KNeighborsClassifier(n_neighbors = neighbors)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
+
+    print("Accuracy with k = ",neighbors," is: ", accuracy_score(y_test, y_pred))
+    print("Precision:", precision_score(y_test, y_pred))
+    print("Recall:", recall_score(y_test, y_pred))
+
+    # predicted probabilities of the positive class
+    y_scores = knn.predict_proba(X_test)[:, 1]
+    # calculate AUC
+    print('AUC:', roc_auc_score(y_test, y_scores))
+
+    # generate the confusion matrix
+    matrix = confusion_matrix(y_test, y_pred)
+
+    print("Confusion Matrix:")
+    print(matrix)
+
+#*************Logistic regression***************
+def LR():
+    print("******Logistic regression********")
+
+    # create the model
+    LRmodel = LogisticRegression(max_iter=1000)
+
+    # fit the model on the training data
+    LRmodel.fit(X_train, y_train)
+
+    # make predictions on the test data
+    y_pred = LRmodel.predict(X_test)
+
+    # evaluate the model performance
+    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("Precision:", precision_score(y_test, y_pred))
+    print("Recall:", recall_score(y_test, y_pred))
+
+    # predicted probabilities of the positive class
+    y_scores = LRmodel.predict_proba(X_test)[:, 1]
+    # calculate AUC
+    print('AUC:', roc_auc_score(y_test, y_scores))
+
+    # generate the confusion matrix
+    matrix = confusion_matrix(y_test, y_pred)
+
+    print("Confusion Matrix:")
+    print(matrix)
+
+# #*************Decision Tree***************
+def DT():
+    print("******Decision Tree********")
+
+    clf = tree.DecisionTreeClassifier(max_depth =3, random_state = 42)
+    clf.fit(X_train, y_train)
+    plt.figure(figsize=(30,15))
+
+    a = tree.plot_tree(clf,feature_names = X.columns.values,
+                class_names = ['yes','no'],rounded = True,
+                filled = True,fontsize=10)
+    plt.show()
+
+# #*************SVM***************
+def SVM():
+    print("******SVM********")
+    clf = svm.SVC(kernel='linear')
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+
+    # evaluate the model performance
+    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("Precision:", precision_score(y_test, y_pred))
+    print("Recall:", recall_score(y_test, y_pred))
+
+    # generate the confusion matrix
+    matrix = confusion_matrix(y_test, y_pred)
+
+    print("Confusion Matrix:")
+    print(matrix)
+
+
+# NB()
+# KNN()
+# LR() problem with scalling data 
+# DT() check if it has pruning and add accuracy mesures
+SVM()

@@ -1,0 +1,27 @@
+	step1: datacleaning
+
+scalling
+remove outlaiers
+
+	step2: EDA correlation
+
+eda summary
+heatmap
+
+	step3: training and test split
+
+	step4: algorithems
+
+Naive bayes
+KNN
+classification tree
+Logistic regression
+
+SVM
+
+	step5: acuracy mesures
+
+ accuracy, precision, recall, and fscore 
+
+bies and variance
+
