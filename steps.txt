@@ -1,16 +1,16 @@
-	step1: datacleaning
+	step1: datacleaning  #DONE
 
 scalling
 remove outlaiers
 
-	step2: EDA correlation
+	step2: EDA correlation #DONE
 
 eda summary
 heatmap
 
-	step3: training and test split
+	step3: training and test split  #DONE
 
-	step4: algorithems
+	step4: algorithems #DONE
 
 Naive bayes
 KNN
@@ -19,9 +19,12 @@ Logistic regression
 
 SVM
 
-	step5: acuracy mesures
+	step5: acuracy mesures 
 
  accuracy, precision, recall, and fscore 
 
 bies and variance
 
+	step6:
+
+add histograms and improve anything that needs improving

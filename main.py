@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import math
 import seaborn as sns
@@ -13,6 +12,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import MinMaxScaler
 from sklearn import tree
 from sklearn import svm
 
@@ -143,14 +143,22 @@ def KNN():
 def LR():
     print("******Logistic regression********")
 
+    # since we removed the outliers in previous steps 
+    # we can use min-max insted of z-score to scale the data
+
     # create the model
     LRmodel = LogisticRegression(max_iter=1000)
+    # define min max scaler
+    scaler = MinMaxScaler()
+    # transform data
+    x_train_scaled = scaler.fit_transform(X_train)
+    x_test_scaled = scaler.fit_transform(X_test)
 
     # fit the model on the training data
-    LRmodel.fit(X_train, y_train)
+    LRmodel.fit(x_train_scaled, y_train)
 
     # make predictions on the test data
-    y_pred = LRmodel.predict(X_test)
+    y_pred = LRmodel.predict(x_test_scaled)
 
     # evaluate the model performance
     print("acuraccy: ",accuracy_score(y_test, y_pred))
@@ -158,7 +166,7 @@ def LR():
     print("Recall:", recall_score(y_test, y_pred))
 
     # predicted probabilities of the positive class
-    y_scores = LRmodel.predict_proba(X_test)[:, 1]
+    y_scores = LRmodel.predict_proba(x_test_scaled)[:, 1]
     # calculate AUC
     print('AUC:', roc_auc_score(y_test, y_scores))
 
@@ -174,6 +182,20 @@ def DT():
 
     clf = tree.DecisionTreeClassifier(max_depth =3, random_state = 42)
     clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+
+    # evaluate the model performance
+    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("Precision:", precision_score(y_test, y_pred))
+    print("Recall:", recall_score(y_test, y_pred))
+
+    # generate the confusion matrix
+    matrix = confusion_matrix(y_test, y_pred)
+
+    print("Confusion Matrix:")
+    print(matrix)
+
     plt.figure(figsize=(30,15))
 
     a = tree.plot_tree(clf,feature_names = X.columns.values,
@@ -202,6 +224,6 @@ def SVM():
 
 # NB()
 # KNN()
-# LR() problem with scalling data 
-# DT() check if it has pruning and add accuracy mesures
-SVM()
+# LR() 
+# DT()
+# SVM()
