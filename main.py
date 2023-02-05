@@ -3,7 +3,7 @@ import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import precision_score
@@ -34,7 +34,7 @@ for column in df.columns:
 for column in df.columns:
     if df[column].dtype == 'object':
         df[column].fillna(df[column].mode()[0], inplace=True)
-
+outliers = pd.DataFrame
 # calculating the outliers for each column
 for column in df.columns:
     if df[column].dtype == "float64":
@@ -42,10 +42,12 @@ for column in df.columns:
         Q3 = float(df[column].quantile(0.75))
 
         IQR = float(Q3 - Q1)
-        n1 = Q1 - (1.5 * IQR)
-        n2 = Q3 + (1.5 * IQR)
+        n1 = Q1 - (1.4 * IQR)
+        n2 = Q3 + (1.4 * IQR)
         outliers = df[(df[column] < n1) | (df[column] > n2)]
-        df = df[~df.index.isin(outliers.index)]
+
+        df[column].loc[outliers.index] = df[column].median()
+        # df = df[~df.index.isin(outliers.index)]
 
 # box plot for outliers
 
@@ -67,7 +69,6 @@ for column in df.columns:
 df = df.drop(columns=['Date'], axis=1)
 df = df.drop(columns=['Location'], axis=1)
 
-
 df = pd.get_dummies(df, columns=['WindGustDir', 'WindDir9am', 'WindDir3pm'])
 df['RainToday2'] = df['RainToday'].map({'Yes': 1, 'No': 0})
 df['RainTomorrow2'] = df['RainTomorrow'].map({'Yes': 1, 'No': 0})
@@ -75,19 +76,20 @@ df['RainTomorrow2'] = df['RainTomorrow'].map({'Yes': 1, 'No': 0})
 df = df.drop(columns=['RainTomorrow'], axis=1)
 df = df.drop(columns=['RainToday'], axis=1)
 
-corr_matrix = df.corr()
-fig, ax = plt.subplots(figsize=(20, 18))
+# corr_matrix = df.corr()
+# fig, ax = plt.subplots(figsize=(20, 18))
 # sns.heatmap(corr_matrix, ax=ax)
 # sns.heatmap(corr_matrix, ax=ax, annot=True , fmt='.1g')
 # plt.show()
 
 # spliting data into 80% training and 20% testing 
 Y = df['RainTomorrow2']
-X = df.drop('RainTomorrow2',axis=1)
+X = df.drop('RainTomorrow2', axis=1)
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-#*************Naive Bayes***************
+
+# *************Naive Bayes***************
 def NB():
     print("******Naive Bayes********")
     # create the naive bayes model
@@ -100,7 +102,8 @@ def NB():
     y_pred = NBmodel.predict(X_test)
 
     # evaluate the model performance
-    print("acuraccy: ",accuracy_score(y_test, y_pred))
+
+    print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
@@ -113,18 +116,19 @@ def NB():
     print("Confusion Matrix:")
     print(matrix)
 
-#*************KNN***************
+
+# *************KNN***************
 def KNN():
     print("******KNN********")
     # Odd or Even
     neighbors = math.isqrt(len(y_test))
     print(neighbors)
 
-    knn = KNeighborsClassifier(n_neighbors = neighbors)
+    knn = KNeighborsClassifier(n_neighbors=neighbors)
     knn.fit(X_train, y_train)
     y_pred = knn.predict(X_test)
 
-    print("Accuracy with k = ",neighbors," is: ", accuracy_score(y_test, y_pred))
+    print("Accuracy with k = ", neighbors, " is: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
@@ -139,7 +143,8 @@ def KNN():
     print("Confusion Matrix:")
     print(matrix)
 
-#*************Logistic regression***************
+
+# *************Logistic regression***************
 def LR():
     print("******Logistic regression********")
 
@@ -156,12 +161,11 @@ def LR():
 
     # fit the model on the training data
     LRmodel.fit(x_train_scaled, y_train)
-
     # make predictions on the test data
     y_pred = LRmodel.predict(x_test_scaled)
 
     # evaluate the model performance
-    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
@@ -176,17 +180,18 @@ def LR():
     print("Confusion Matrix:")
     print(matrix)
 
+
 # #*************Decision Tree***************
 def DT():
     print("******Decision Tree********")
 
-    clf = tree.DecisionTreeClassifier(max_depth =3, random_state = 42)
+    clf = tree.DecisionTreeClassifier(max_depth=3, random_state=42)
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
 
     # evaluate the model performance
-    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
@@ -196,22 +201,23 @@ def DT():
     print("Confusion Matrix:")
     print(matrix)
 
-    plt.figure(figsize=(30,15))
+    plt.figure(figsize=(30, 15))
 
-    a = tree.plot_tree(clf,feature_names = X.columns.values,
-                class_names = ['yes','no'],rounded = True,
-                filled = True,fontsize=10)
+    a = tree.plot_tree(clf, feature_names=X.columns.values,
+                       class_names=['yes', 'no'], rounded=True,
+                       filled=True, fontsize=10)
     plt.show()
+
 
 # #*************SVM***************
 def SVM():
     print("******SVM********")
     clf = svm.SVC(kernel='linear')
-    clf.fit(X_train,y_train)
+    clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
 
     # evaluate the model performance
-    print("acuraccy: ",accuracy_score(y_test, y_pred))
+    print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
@@ -224,6 +230,8 @@ def SVM():
 
 # NB()
 # KNN()
-# LR() 
+# LR()
 # DT()
 # SVM()
+
+
