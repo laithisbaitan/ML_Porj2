@@ -15,6 +15,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import MinMaxScaler
 from sklearn import tree
 from sklearn import svm
+from sklearn import datasets, neighbors
+from mlxtend.plotting import plot_decision_regions
 
 # Load the data
 df = pd.read_excel('WeatherData.xls')
@@ -143,7 +145,6 @@ def KNN():
     print("Confusion Matrix:")
     print(matrix)
 
-
 # *************Logistic regression***************
 def LR():
     print("******Logistic regression********")
@@ -229,7 +230,7 @@ def SVM():
 
 
 # NB()
-# KNN()
+KNN()
 # LR()
 # DT()
 # SVM()
