@@ -17,6 +17,8 @@ from sklearn import tree
 from sklearn import svm
 from sklearn import datasets, neighbors
 from mlxtend.plotting import plot_decision_regions
+from mlxtend.evaluate import bias_variance_decomp
+
 
 # Load the data
 df = pd.read_excel('WeatherData.xls')
@@ -113,6 +115,11 @@ def NB():
     # calculate AUC
     print('AUC:', roc_auc_score(y_test, y_scores))
 
+    mse, bias, var = bias_variance_decomp(NBmodel, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
+    print("MSE: ", mse)
+    print("Bias:", bias)
+    print("Variance:", var)
+
     # generate the confusion matrix
     matrix = confusion_matrix(y_test, y_pred)
     print("Confusion Matrix:")
@@ -138,6 +145,11 @@ def KNN():
     y_scores = knn.predict_proba(X_test)[:, 1]
     # calculate AUC
     print('AUC:', roc_auc_score(y_test, y_scores))
+
+    mse, bias, var = bias_variance_decomp(knn, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
+    print("MSE: ", mse)
+    print("Bias:", bias)
+    print("Variance:", var)
 
     # generate the confusion matrix
     matrix = confusion_matrix(y_test, y_pred)
@@ -175,6 +187,11 @@ def LR():
     # calculate AUC
     print('AUC:', roc_auc_score(y_test, y_scores))
 
+    mse, bias, var = bias_variance_decomp(LRmodel, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
+    print("MSE: ", mse)
+    print("Bias:", bias)
+    print("Variance:", var)
+
     # generate the confusion matrix
     matrix = confusion_matrix(y_test, y_pred)
 
@@ -195,6 +212,11 @@ def DT():
     print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
+
+    mse, bias, var = bias_variance_decomp(clf, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
+    print("MSE: ", mse)
+    print("Bias:", bias)
+    print("Variance:", var)
 
     # generate the confusion matrix
     matrix = confusion_matrix(y_test, y_pred)
@@ -222,6 +244,11 @@ def SVM():
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
 
+    mse, bias, var = bias_variance_decomp(clf, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
+    print("MSE: ", mse)
+    print("Bias:", bias)
+    print("Variance:", var)
+
     # generate the confusion matrix
     matrix = confusion_matrix(y_test, y_pred)
 
@@ -230,7 +257,7 @@ def SVM():
 
 
 # NB()
-KNN()
+# KNN()
 # LR()
 # DT()
 # SVM()
