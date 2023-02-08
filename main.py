@@ -110,7 +110,8 @@ def NB():
     print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
-
+    F1 = 2 * (precision_score(y_test, y_pred) * recall_score(y_test, y_pred)) / (precision_score(y_test, y_pred) + recall_score(y_test, y_pred))
+    print("F1 Score:", F1)
     y_scores = NBmodel.predict_proba(X_test)[:, 1]
     # calculate AUC
     print('AUC:', roc_auc_score(y_test, y_scores))
@@ -140,7 +141,9 @@ def KNN():
     print("Accuracy with k = ", neighbors, " is: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
-
+    F1 = 2 * (precision_score(y_test, y_pred) * recall_score(y_test, y_pred)) / (
+                precision_score(y_test, y_pred) + recall_score(y_test, y_pred))
+    print("F1 Score:", F1)
     # predicted probabilities of the positive class
     y_scores = knn.predict_proba(X_test)[:, 1]
     # calculate AUC
@@ -181,7 +184,9 @@ def LR():
     print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
-
+    F1 = 2 * (precision_score(y_test, y_pred) * recall_score(y_test, y_pred)) / (
+                precision_score(y_test, y_pred) + recall_score(y_test, y_pred))
+    print("F1 Score:", F1)
     # predicted probabilities of the positive class
     y_scores = LRmodel.predict_proba(x_test_scaled)[:, 1]
     # calculate AUC
@@ -212,7 +217,9 @@ def DT():
     print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
-
+    F1 = 2 * (precision_score(y_test, y_pred) * recall_score(y_test, y_pred)) / (
+                precision_score(y_test, y_pred) + recall_score(y_test, y_pred))
+    print("F1 Score:", F1)
     mse, bias, var = bias_variance_decomp(clf, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
     print("MSE: ", mse)
     print("Bias:", bias)
@@ -243,7 +250,9 @@ def SVM():
     print("accuracy: ", accuracy_score(y_test, y_pred))
     print("Precision:", precision_score(y_test, y_pred))
     print("Recall:", recall_score(y_test, y_pred))
-
+    F1 = 2 * (precision_score(y_test, y_pred) * recall_score(y_test, y_pred)) / (
+                precision_score(y_test, y_pred) + recall_score(y_test, y_pred))
+    print("F1 Score:", F1)
     mse, bias, var = bias_variance_decomp(clf, X_train.values, y_train.values, X_test.values, y_test.values, loss='mse', num_rounds=200, random_seed=123)
     print("MSE: ", mse)
     print("Bias:", bias)
